@@ -7,6 +7,7 @@ import localforage from 'localforage';
 
 function App() {
   const [postsList, setPostsList] = useState([])
+  const [username, setUsername] = useState('Nadav')
 
   useEffect(() => {
     localforage.getItem("postsList").then(value => {
@@ -15,10 +16,12 @@ function App() {
   }, [])
 
   return (
-    <PostsContext.Provider className='App' value={{ postsList, setPostsList }}>
-      <div className="App">
-        <PostForm className='p-2' />
-        <PostList />
+    <PostsContext.Provider className='App' value={{ postsList, setPostsList, username }}>
+      <div className='wrapper'>
+        <div className="App">
+          <PostForm className='p-2' />
+          <PostList />
+        </div>
       </div>
     </PostsContext.Provider>
   );

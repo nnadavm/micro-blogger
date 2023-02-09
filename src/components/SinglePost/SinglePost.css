@@ -1,17 +1,20 @@
 .single-post-container {
     margin-top: 10px;
     padding: 10px;
-    border-radius: 10px;
-    border: 1px black solid;
+    border-radius: 6px;
     white-space: pre-wrap;
+    overflow-wrap: break-word;
+    background-color: #343A40;
 }
 
 .post-header {
     display: flex;
     justify-content: space-between;
     font-size: 14px;
+    color: #6C757D;
 }
 
 p {
     padding-top: 10px;
+    color: white;
 }

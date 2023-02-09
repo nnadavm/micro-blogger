@@ -7,13 +7,13 @@ import PostsContext from '../../contexts/PostsContext';
 import savePostsToLocalStorage from '../../utils/savetolocalstorage';
 
 function PostForm() {
+    const { postsList, setPostsList, username } = useContext(PostsContext)
     const initialState = {
         content: '',
-        userName: 'Nadav',
+        userName: username,
         date: ''
     }
 
-    const { postsList, setPostsList } = useContext(PostsContext)
     const [singlePost, setSinglePost] = useState(initialState)
 
     function handleOnChange(e, key) {
@@ -46,9 +46,9 @@ function PostForm() {
                 onChange={(e) => handleOnChange(e, "content")}
             />
             <div className='form-footer'>
-                <div className="error">
-                    {singlePost.content.length === 140 ? 'A post cant be longer then 140 characters!' : ''}
-                </div>
+                {singlePost.content.length === 140 ? <div className="error">
+                    A post cant be longer then 140 characters!
+                </div> : <div></div>}
                 <Button className='btn'
                     variant="outline-primary"
                     onClick={handleOnSave}

@@ -2,32 +2,40 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* background-color: #001E3C; */
-    border-radius: 10px;
-    border: 1px black solid;
+    background-color: #15202B;
+    border-radius: 6px;
+    border: 1px #CCCCCC solid;
     max-height: 180px;
 }
 
 .form {
-    /* background-color: #001E3C; */
-    /* border-radius: 5px; */
+    background-color: #15202B;
+    color: white;
     resize: none;
     max-width: 98%;
     outline: none;
     border: none;
 }
 
+::placeholder { 
+    color: #CCCCCC;
+  }
+
 .form-footer {
-    /* border: 1px blue solid; */
     width: 100%;
+    padding: 5px;
     display: flex;
     justify-content: space-between;
-    /* justify-self: end; */
-    /* height: 30px; */
-
+    align-items: center;
 }
 
 
 .error { 
-    background-color: red;
+    background-color: #F8D7DA;
+    color: #721C24;
+    border-radius: 4px;
+    text-align: center;
+    height: 29px;
+    padding-left: 5px;
+    padding-right: 5px;
 }

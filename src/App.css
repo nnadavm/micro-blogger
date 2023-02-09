@@ -1,7 +1,9 @@
+.wrapper {
+  background-color: #15202B;
+}
+
 .App {
   width: 60vw;
   margin: 0 auto;
-  /* background-color: #0A1929; */
-  /* height: 100vh; */
 }
 
