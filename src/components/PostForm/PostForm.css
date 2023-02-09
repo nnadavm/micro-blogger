@@ -1,0 +1,33 @@
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* background-color: #001E3C; */
+    border-radius: 10px;
+    border: 1px black solid;
+    max-height: 180px;
+}
+
+.form {
+    /* background-color: #001E3C; */
+    /* border-radius: 5px; */
+    resize: none;
+    max-width: 98%;
+    outline: none;
+    border: none;
+}
+
+.form-footer {
+    /* border: 1px blue solid; */
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    /* justify-self: end; */
+    /* height: 30px; */
+
+}
+
+
+.error { 
+    background-color: red;
+}

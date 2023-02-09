@@ -1,0 +1,17 @@
+.single-post-container {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px black solid;
+    white-space: pre-wrap;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+p {
+    padding-top: 10px;
+}
