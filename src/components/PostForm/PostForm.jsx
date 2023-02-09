@@ -1,20 +1,19 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import './PostForm.css'
 import TextareaAutosize from '@mui/base/TextareaAutosize';
 import Button from 'react-bootstrap/Button';
 import { v4 as uuidv4 } from 'uuid';
 import PostsContext from '../../contexts/PostsContext';
-import savePostsToLocalStorage from '../../utils/savetolocalstorage';
 
 function PostForm() {
-    const { postsList, setPostsList, username } = useContext(PostsContext)
+    const { username, setIsLoading ,isLoading } = useContext(PostsContext)
     const initialState = {
         content: '',
         userName: username,
         date: ''
     }
-
     const [singlePost, setSinglePost] = useState(initialState)
+    const [serverError, setServerError] = useState(null);
 
     function handleOnChange(e, key) {
         setSinglePost(pre => {
@@ -25,14 +24,38 @@ function PostForm() {
         })
     }
 
-    const handleOnSave = () => {
-        const newArray = [...postsList, { ...singlePost, id: uuidv4(), date: Date.now() }]
-        newArray.sort((a, b) => b.date - a.date)
-        setPostsList(newArray)
-        savePostsToLocalStorage(newArray)
+    function handleOnSave() {
+        setServerError(null);
+        saveToServer();
         setSinglePost(initialState)
     }
 
+    async function saveToServer() {
+
+        const URL = 'https://micro-blogging-dot-full-stack-course-services.ew.r.appspot.com/tweet';
+        const options = {
+            method: 'POST',
+            body: JSON.stringify({
+                content: singlePost.content,
+                userName: singlePost.userName,
+                date: new Date().toISOString()
+            }),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            }
+        }
+
+        try {
+            const response = await fetch(URL, options);
+            const data = await response.json();
+            console.log(data);
+            if (data.statusCode) setServerError(data.message);
+            setIsLoading(true);
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
 
     return (
         <div className='formContainer'>
@@ -49,8 +72,13 @@ function PostForm() {
                 {singlePost.content.length === 140 ? <div className="error">
                     A post cant be longer then 140 characters!
                 </div> : <div></div>}
-                <Button className='btn'
+                {serverError !== null && singlePost.content.length < 140 ? <div className="error">
+                    Error from server: {serverError}
+                </div> : ''}
+                <Button
+                    className='btn'
                     variant="outline-primary"
+                    disabled={isLoading}
                     onClick={handleOnSave}
                 >Post</Button>
             </div>

@@ -3,24 +3,43 @@ import PostForm from "./components/PostForm/PostForm";
 import PostList from './components/PostList/PostList';
 import PostsContext from './contexts/PostsContext';
 import React, { useState, useEffect } from 'react';
-import localforage from 'localforage';
+import Spinner from 'react-bootstrap/Spinner';
 
 function App() {
-  const [postsList, setPostsList] = useState([])
-  const [username, setUsername] = useState('Nadav')
+  const [postsList, setPostsList] = useState([]);
+  const [username, setUsername] = useState('userName');
+  const [isLoading, setIsLoading] = useState(true);
+
+  async function fetchFromServer() {
+    const URL = 'https://micro-blogging-dot-full-stack-course-services.ew.r.appspot.com/tweet'
+
+    try {
+      const response = await fetch(URL);
+      const data = await response.json();
+      console.log(data);
+      setPostsList(data.tweets);
+      setIsLoading(false);
+    }
+    catch (e) {
+      console.log(e)
+    }
+  }
 
   useEffect(() => {
-    localforage.getItem("postsList").then(value => {
-      if (value) setPostsList(value)
-    }).catch(err => console.error(err))
-  }, [])
+    fetchFromServer();
+  }, [isLoading])
 
   return (
-    <PostsContext.Provider className='App' value={{ postsList, setPostsList, username }}>
+    <PostsContext.Provider className='App' value={{ postsList, setPostsList, username, setIsLoading, isLoading }}>
       <div className='wrapper'>
+
         <div className="App">
           <PostForm className='p-2' />
-          <PostList />
+          {!isLoading ?
+            <PostList /> :
+            <div className='d-flex justify-content-center p-3'>
+              <Spinner animation="border" variant="light" />
+            </div>}
         </div>
       </div>
     </PostsContext.Provider>
