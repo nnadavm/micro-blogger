@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import PostsContext from '../../contexts/PostsContext';
 
 function PostForm() {
-    const { username, setIsLoading ,isLoading } = useContext(PostsContext)
+    const { username, setIsLoading, isLoading } = useContext(PostsContext)
     const initialState = {
         content: '',
         userName: username,
@@ -56,6 +56,14 @@ function PostForm() {
             console.log(e)
         }
     }
+    let errorMessage;
+    if (singlePost.content.length === 140) {
+        errorMessage = <div className="error">A post cant be longer then 140 characters!</div>;
+    } else if (serverError !== null && singlePost.content.length < 140) {
+        errorMessage = <div className="error">Error from server: {serverError}</div>;
+    } else {
+        errorMessage = <div></div>;
+    }
 
     return (
         <div className='formContainer'>
@@ -69,12 +77,7 @@ function PostForm() {
                 onChange={(e) => handleOnChange(e, "content")}
             />
             <div className='form-footer'>
-                {singlePost.content.length === 140 ? <div className="error">
-                    A post cant be longer then 140 characters!
-                </div> : <div></div>}
-                {serverError !== null && singlePost.content.length < 140 ? <div className="error">
-                    Error from server: {serverError}
-                </div> : ''}
+                {errorMessage}
                 <Button
                     className='btn'
                     variant="outline-primary"
