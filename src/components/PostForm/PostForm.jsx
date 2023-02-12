@@ -30,7 +30,6 @@ function PostForm() {
     }
 
     async function saveToServer() {
-
         const URL = 'https://micro-blogging-dot-full-stack-course-services.ew.r.appspot.com/tweet';
         const options = {
             method: 'POST',
@@ -55,6 +54,7 @@ function PostForm() {
             console.log(e)
         }
     }
+
     function setErrorMessage() {
         let errorMessage;
         if (singlePost.content.length === 140) {

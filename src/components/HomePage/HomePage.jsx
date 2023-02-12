@@ -5,7 +5,6 @@ import PostsContext from '../../contexts/PostsContext';
 import Spinner from 'react-bootstrap/Spinner';
 import UsernameContext from '../../contexts/UsernameContext';
 
-
 function HomePage() {
     const { username , setUsername } = useContext(UsernameContext)
     const [postsList, setPostsList] = useState([]);
