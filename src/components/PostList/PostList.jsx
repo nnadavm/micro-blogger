@@ -3,7 +3,7 @@ import SinglePost from '../SinglePost/SinglePost'
 import PostsContext from '../../contexts/PostsContext';
 
 function PostList() {
-    const { postsList, setPostsList } = useContext(PostsContext)
+    const { postsList } = useContext(PostsContext)
 
     return (
         <div>

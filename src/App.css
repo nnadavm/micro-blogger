@@ -1,9 +1,9 @@
-.wrapper {
+.app-wrapper{
   background-color: #15202B;
   min-height: 100vh;
 }
 
-.App {
+.page-wrapper {
   width: 60vw;
   margin: 0 auto;
 }

@@ -1,12 +1,11 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext } from 'react'
 import './PostForm.css'
 import TextareaAutosize from '@mui/base/TextareaAutosize';
 import Button from 'react-bootstrap/Button';
-import { v4 as uuidv4 } from 'uuid';
 import PostsContext from '../../contexts/PostsContext';
 
 function PostForm() {
-    const { username, setIsLoading, isLoading } = useContext(PostsContext)
+    const { username, setIsLoading, isLoading } = useContext(PostsContext);
     const initialState = {
         content: '',
         userName: username,
@@ -56,13 +55,16 @@ function PostForm() {
             console.log(e)
         }
     }
-    let errorMessage;
-    if (singlePost.content.length === 140) {
-        errorMessage = <div className="error">A post cant be longer then 140 characters!</div>;
-    } else if (serverError !== null && singlePost.content.length < 140) {
-        errorMessage = <div className="error">Error from server: {serverError}</div>;
-    } else {
-        errorMessage = <div></div>;
+    function setErrorMessage() {
+        let errorMessage;
+        if (singlePost.content.length === 140) {
+            errorMessage = <div className="error">A post cant be longer then 140 characters!</div>;
+        } else if (serverError !== null && singlePost.content.length < 140) {
+            errorMessage = <div className="error">Error from server: {serverError}</div>;
+        } else {
+            errorMessage = <div></div>;
+        }
+        return errorMessage
     }
 
     return (
@@ -71,13 +73,13 @@ function PostForm() {
                 className='form'
                 minRows={10}
                 maxLength={140}
-                placeholder="What's on your mind?"
+                placeholder={`Hello ${username}, What's on your mind?`}
                 style={{ width: '60vw' }}
                 value={singlePost.content}
                 onChange={(e) => handleOnChange(e, "content")}
             />
             <div className='form-footer'>
-                {errorMessage}
+                {setErrorMessage()}
                 <Button
                     className='btn'
                     variant="outline-primary"

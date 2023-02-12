@@ -1,48 +1,40 @@
 import './App.css'
-import PostForm from "./components/PostForm/PostForm";
-import PostList from './components/PostList/PostList';
-import PostsContext from './contexts/PostsContext';
 import React, { useState, useEffect } from 'react';
-import Spinner from 'react-bootstrap/Spinner';
+import HomePage from './components/HomePage/HomePage';
+import ProfilePage from './components/ProfilePage/ProfilePage';
+import NavBar from './components/Navbar/Navbar';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import UsernameContext from './contexts/UsernameContext';
 
 function App() {
-  const [postsList, setPostsList] = useState([]);
-  const [username, setUsername] = useState('userName');
-  const [isLoading, setIsLoading] = useState(true);
-
-  async function fetchFromServer() {
-    const URL = 'https://micro-blogging-dot-full-stack-course-services.ew.r.appspot.com/tweet'
-
-    try {
-      const response = await fetch(URL);
-      const data = await response.json();
-      console.log(data);
-      setPostsList(data.tweets);
-      setIsLoading(false);
-    }
-    catch (e) {
-      console.log(e)
-    }
-  }
+  const [username, setUsername] = useState(JSON.parse(localStorage.getItem('username')));
 
   useEffect(() => {
-    fetchFromServer();
-  }, [isLoading])
+    if (username === null) {
+      setUsername('guest');
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('username', JSON.stringify(username));
+  }, [username]);
 
   return (
-    <PostsContext.Provider className='App' value={{ postsList, setPostsList, username, setIsLoading, isLoading }}>
-      <div className='wrapper'>
-
-        <div className="App">
-          <PostForm className='p-2' />
-          {!isLoading ?
-            <PostList /> :
-            <div className='d-flex justify-content-center p-3'>
-              <Spinner animation="border" variant="light" />
-            </div>}
+    <div className='app-wrapper'>
+      <UsernameContext.Provider value={{ username, setUsername }}>
+        <NavBar />
+        <div className='page-wrapper'>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/home" element={<HomePage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              {/* <Route path="*" element={<NoPage />} /> */}
+            </Routes>
+          </BrowserRouter>
         </div>
-      </div>
-    </PostsContext.Provider>
+      </UsernameContext.Provider>
+    </div>
   );
 }
 
