@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import "./ProfilePage.css"
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
+import UsernameContext from '../../contexts/UsernameContext';
 
 function ProfilePage() {
-    const [inputValue, setInputValue] = useState('username')
+    const { username } = useContext(UsernameContext)
+    const [inputValue, setInputValue] = useState(username)
 
     return (
         <div>

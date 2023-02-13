@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect } from 'react'
 import SinglePost from '../SinglePost/SinglePost'
 import PostsContext from '../../contexts/PostsContext';
-import Spinner from 'react-bootstrap/Spinner';
 
 
 function PostList() {

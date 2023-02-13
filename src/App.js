@@ -29,7 +29,6 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="profile" element={<ProfilePage />} />
-              {/* <Route path="*" element={<NoPage />} /> */}
             </Routes>
           </BrowserRouter>
         </div>

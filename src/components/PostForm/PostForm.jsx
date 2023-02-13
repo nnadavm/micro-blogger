@@ -4,9 +4,11 @@ import TextareaAutosize from '@mui/base/TextareaAutosize';
 import Button from 'react-bootstrap/Button';
 import PostsContext from '../../contexts/PostsContext';
 import { v4 as uuidv4 } from 'uuid';
+import UsernameContext from '../../contexts/UsernameContext';
 
 function PostForm() {
-    const { postsList, setPostsList, username } = useContext(PostsContext);
+    const { postsList, setPostsList } = useContext(PostsContext);
+    const { username } = useContext(UsernameContext)
     const initialState = {
         content: '',
         userName: username,
@@ -52,7 +54,6 @@ function PostForm() {
         try {
             const response = await fetch(URL, options);
             const data = await response.json();
-            console.log(data);
             if (data.statusCode) setServerError(data.message);
         }
         catch (e) {
@@ -88,7 +89,6 @@ function PostForm() {
                 <Button
                     className='btn'
                     variant="outline-primary"
-                    // disabled={isLoading}
                     onClick={handleOnSave}
                 >Post</Button>
             </div>

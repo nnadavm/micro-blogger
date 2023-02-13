@@ -1,44 +1,17 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState  } from 'react';
 import PostForm from '../PostForm/PostForm';
 import PostList from '../PostList/PostList';
 import PostsContext from '../../contexts/PostsContext';
-import Spinner from 'react-bootstrap/Spinner';
-import UsernameContext from '../../contexts/UsernameContext';
 
 function HomePage() {
-    const { username , setUsername } = useContext(UsernameContext)
     const [postsList, setPostsList] = useState([]);
 
-    // async function fetchFromServer() {
-    //     const URL = 'https://micro-blogging-dot-full-stack-course-services.ew.r.appspot.com/tweet'
-
-    //     try {
-    //         const response = await fetch(URL);
-    //         const data = await response.json();
-    //         console.log(data);
-    //         setPostsList(data.tweets);
-    //         setIsLoading(false);
-    //     }
-    //     catch (e) {
-    //         console.log(e)
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     fetchFromServer();
-    // }, [isLoading])
-
     return (
-        <PostsContext.Provider value={{ postsList, setPostsList, username, setUsername }}>
+        <PostsContext.Provider value={{ postsList, setPostsList }}>
             <div className='wrapper'>
                 <div className="App">
                     <PostForm className='p-2' />
                     <PostList/>
-                    {/* {!isLoading ?
-                        <PostList /> :
-                        <div className='d-flex justify-content-center p-3'>
-                            <Spinner animation="border" variant="light" />
-                        </div>} */}
                 </div>
             </div>
         </PostsContext.Provider>
