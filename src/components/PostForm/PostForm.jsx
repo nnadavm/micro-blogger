@@ -3,9 +3,10 @@ import './PostForm.css'
 import TextareaAutosize from '@mui/base/TextareaAutosize';
 import Button from 'react-bootstrap/Button';
 import PostsContext from '../../contexts/PostsContext';
+import { v4 as uuidv4 } from 'uuid';
 
 function PostForm() {
-    const { username, setIsLoading, isLoading } = useContext(PostsContext);
+    const { postsList, setPostsList, username } = useContext(PostsContext);
     const initialState = {
         content: '',
         userName: username,
@@ -24,6 +25,11 @@ function PostForm() {
     }
 
     function handleOnSave() {
+        if (singlePost.content.length > 0) {
+            const newArray = [...postsList, { ...singlePost, id: uuidv4(), date: new Date().toISOString() }]
+            newArray.sort((a, b) => (a.date > b.date) ? -1 : 1)
+            setPostsList(newArray)
+        }
         setServerError(null);
         saveToServer();
         setSinglePost(initialState)
@@ -48,7 +54,6 @@ function PostForm() {
             const data = await response.json();
             console.log(data);
             if (data.statusCode) setServerError(data.message);
-            setIsLoading(true);
         }
         catch (e) {
             console.log(e)
@@ -83,7 +88,7 @@ function PostForm() {
                 <Button
                     className='btn'
                     variant="outline-primary"
-                    disabled={isLoading}
+                    // disabled={isLoading}
                     onClick={handleOnSave}
                 >Post</Button>
             </div>
