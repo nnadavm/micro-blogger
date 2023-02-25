@@ -1,32 +1,17 @@
-import React, {useState , useContext} from 'react';
-import {
-  MDBBtn,
-  MDBContainer,
-  MDBRow,
-  MDBCol,
-  MDBCard,
-  MDBCardBody,
-  MDBInput,
-  MDBIcon
-}
-  from 'mdb-react-ui-kit';
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword, signOut,
-  onAuthStateChanged, signInWithPopup
-} from 'firebase/auth'
-import { auth, googleProvider } from '../../firebaseconfig';
+import React, { useState, useContext } from 'react';
+import { MDBBtn, MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBInput, MDBIcon } from 'mdb-react-ui-kit';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
+import { auth, googleProvider } from '../../utils/firebaselib';
 import { AuthContext } from '../../contexts/AuthContext';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Alert, Button } from 'react-bootstrap';
 
-
-function LoginForm({setIsSignup}) {
-  const { currentUser , setCurrentUser } = useContext(AuthContext);
-  const initialState = {email: '', password: ''};
+function LoginForm({ setIsSignup }) {
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const initialState = { email: '', password: '' };
   const [userInput, setUserInput] = useState(initialState);
+  const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
-
 
   function handleOnChange(e, key) {
     setUserInput(pre => {
@@ -37,25 +22,28 @@ function LoginForm({setIsSignup}) {
     })
   }
 
-  function handleGoogleLogin() {
+  async function handleGoogleLogin() {
     signInWithPopup(auth, googleProvider)
-    .then((cred) => {
-      setCurrentUser(cred.user)
+      .then((cred) => {
+        setCurrentUser(cred.user)
         console.log('user logged in:', cred.user)
         if (cred) navigate("/home");
       })
       .catch(err => {
         console.log(err.message)
+        setErrorMessage(err.message);
       })
-    }
+  };
 
   function loginSubmit() {
     signInWithEmailAndPassword(auth, userInput.email, userInput.password)
       .then(cred => {
-        console.log('user logged in:', cred.user)
+        console.log('user logged in:', cred.user);
+        if (cred) navigate("/home");
       })
       .catch(err => {
-        console.log(err.message)
+        console.log(err.message);
+        setErrorMessage(err.message);
       })
   }
 
@@ -71,21 +59,23 @@ function LoginForm({setIsSignup}) {
               <h2 className="fw-bold mb-2 text-uppercase">Login</h2>
               <p className="text-white-50 mb-5">Please enter your email and password</p>
 
-              <MDBInput wrapperClass='mb-4 mx-5 w-100' labelClass='text-white' label='Email address'  type='email' size="lg" value={userInput.email} onChange={(e) => handleOnChange(e, "email")} />
-              <MDBInput wrapperClass='mb-4 mx-5 w-100' labelClass='text-white' label='Password' id='formControlLg' type='password' size="lg" value={userInput.password} onChange={(e) => handleOnChange(e, "password")}/>
+              <MDBInput wrapperClass='mb-4 mx-5 w-100' labelClass='text-white' label='Email address' type='email' size="lg" value={userInput.email} onChange={(e) => handleOnChange(e, "email")} />
+              <MDBInput wrapperClass='mb-4 mx-5 w-100' labelClass='text-white' label='Password' id='formControlLg' type='password' size="lg" value={userInput.password} onChange={(e) => handleOnChange(e, "password")} />
 
-              <MDBBtn onClick={loginSubmit} outline className='mx-2 px-5' color='white' size='lg'>
-                Login
-              </MDBBtn>
+              <Button className='login-btn mx-2 px-5' variant="outline-light" size="lg" onClick={loginSubmit}>Login</Button>
 
-              <div className='d-flex flex-row mt-3 mb-5'>
-                <MDBBtn tag='a' color='none' className='m-3' style={{ color: 'white' }} onClick={handleGoogleLogin}>
+              {errorMessage ? <Alert variant='danger'>{errorMessage}</Alert> : ''}
+
+              <p className="text-white-50 mb-1">Sign in with Google:</p>
+
+              <div className='d-flex flex-row mt-1 mb-1'>
+                <MDBBtn tag='a' color='none'  style={{ color: 'white' }} onClick={handleGoogleLogin}>
                   <MDBIcon fab icon='google' size="lg" />
                 </MDBBtn>
               </div>
 
               <div>
-                <p className="mb-0">Don't have an account? <a className="text-white-50 fw-bold" onClick={()=> setIsSignup(true)}>Sign Up</a></p>
+                <p className="mb-0">Don't have an account? <a className="text-white-50 fw-bold" onClick={() => setIsSignup(true)}>Sign Up</a></p>
               </div>
             </MDBCardBody>
           </MDBCard>

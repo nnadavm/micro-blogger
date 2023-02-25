@@ -1,25 +1,17 @@
-import React, { useState, useContext } from 'react'
-import './PostForm.css'
+import React, { useState, useContext } from 'react';
+import './PostForm.css';
 import TextareaAutosize from '@mui/base/TextareaAutosize';
 import Button from 'react-bootstrap/Button';
-import PostsContext from '../../contexts/PostsContext';
 import { v4 as uuidv4 } from 'uuid';
-import db from '../../firebaseconfig';
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore'
-import { colRef, colRefQuery } from '../../firebaseconfig';
+import { addDoc } from 'firebase/firestore';
+import { colRef} from '../../utils/firebaselib';
 import { AuthContext } from '../../contexts/AuthContext';
-
-
 
 function PostForm() {
     const { currentUser } = useContext(AuthContext);
-    const initialState = {
-        content: '',
-        userName: '',
-        date: ''
-    };
+    const initialState = {content: ''};
     const [singlePost, setSinglePost] = useState(initialState);
-    const [serverError, setServerError] = useState(null);
+    const [errorMessage, setErrorMessage] = useState(null);
 
     function handleOnChange(e, key) {
         setSinglePost(pre => {
@@ -31,35 +23,43 @@ function PostForm() {
     };
 
     function addPostToFirebase() {
-        addDoc(colRef, {
+        const postObj = {
             ...singlePost,
+            uid: currentUser.uid,
             id: uuidv4(),
             userName: currentUser.displayName,
             date: new Date().toISOString(),
             photoURL: currentUser.photoURL
+        };
+        console.log('submitting post:' ,postObj );
+        addDoc(colRef, postObj)
+        .then(() => {
+            console.log('post submit');
         })
-        .catch((e) => console.log(e))
+        .catch((e) => {
+            console.log(e);
+            setErrorMessage(e);
+        })
     };
 
-    function handleOnSave() {
-        if (singlePost.content.length > 0) {
+    function handleSubmit() {
+        setErrorMessage(null);
+        if (singlePost.content.length > 0 && singlePost.content.length < 140 ) {
             addPostToFirebase();
+            setSinglePost(initialState);
+        } else if (singlePost.content.length === 0) {
+            setErrorMessage('Post cant be empty');
+        } else if (singlePost.content.length === 140) {
+            setErrorMessage('A post cant be longer then 140 characters!');
         }
-        setServerError(null);
-        setSinglePost(initialState);
     };
 
-    // function setErrorMessage() {
-    //     let errorMessage;
-    //     if (singlePost.content.length === 140) {
-    //         errorMessage = <div className="error">A post cant be longer then 140 characters!</div>;
-    //     } else if (serverError !== null && singlePost.content.length < 140) {
-    //         errorMessage = <div className="error">Error from server: {serverError}</div>;
-    //     } else {
-    //         errorMessage = <div></div>;
-    //     }
-    //     return errorMessage
-    // };
+    function onEnterPress(e) {
+        if(e.keyCode == 13 && e.shiftKey == false) {
+          e.preventDefault();
+          handleSubmit();
+        }
+      };
 
     return (
         <div className='formContainer'>
@@ -71,13 +71,15 @@ function PostForm() {
                 style={{ width: '60vw' }}
                 value={singlePost.content}
                 onChange={(e) => handleOnChange(e, "content")}
+                onKeyDown={onEnterPress}
             />
             <div className='form-footer'>
-                {/* {setErrorMessage()} */}
+            {errorMessage ? <div className="error">{errorMessage}</div> : <div></div>}
+
                 <Button
                     className='btn'
                     variant="outline-primary"
-                    onClick={handleOnSave}
+                    onClick={handleSubmit}
                 >Post</Button>
             </div>
 
@@ -85,4 +87,4 @@ function PostForm() {
     )
 }
 
-export default PostForm
+export default PostForm;

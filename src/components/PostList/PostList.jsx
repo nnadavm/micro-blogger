@@ -1,38 +1,30 @@
-import React, { useContext, useEffect, useState } from 'react'
-import SinglePost from '../SinglePost/SinglePost'
-import PostsContext from '../../contexts/PostsContext';
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, onSnapshot } from 'firebase/firestore'
-import {colRefQuery} from '../../firebaseconfig';
+import React from 'react';
+import LoaderComponent from '../LoaderComponent/LoaderComponent';
+import SinglePost from '../SinglePost/SinglePost';
+import { loadNextPage } from '../../utils/firebaselib';
+import InfiniteScroll from "react-infinite-scroll-component";
 
-function PostList({ postsList, setPostsList }) {
-
-    function suscribeToFirebase() {
-        try {
-            onSnapshot(colRefQuery, (snapshot) => {
-                let posts = [];
-                snapshot.docs.forEach(doc => {
-                    posts.push({ ...doc.data(), id: doc.id })
-                });
-                setPostsList(posts);
-            })
-        }
-        catch (e) {
-            console.log(e)
-        }
-    }
-
-    useEffect(() => {
-        suscribeToFirebase();
-    }, [])
+function PostList({ postsList, setPostsList, lastDocument, setLastDocument }) {
 
     return (
         <div>
-            {postsList.length ? postsList.map((post, index) => {
-                return (<SinglePost post={post} key={index} />)
-            }) : ''}
+            <InfiniteScroll
+                dataLength={postsList.length}
+                next={() => loadNextPage(postsList, setPostsList, lastDocument, setLastDocument)}
+                hasMore={lastDocument && postsList}
+                loader={<div className='d-flex justify-content-center p-5'>
+                    <h5 style={{ color: 'white' }}>Loading...</h5>
+                </div>}
+                endMessage={postsList.length ? <div className='d-flex justify-content-center p-5'>
+                    <h5 style={{ color: 'white' }}>You're all caught up!</h5>
+                </div> : ''}
+            >
+                {postsList.length ? postsList.map((post, index) => {
+                    return (<SinglePost post={post} key={index} />)
+                }) : <LoaderComponent alignTop={true} />}
+            </InfiniteScroll>
         </div>
     )
 }
 
-export default PostList
+export default PostList;

@@ -1,31 +1,16 @@
 import React, { useState, useContext } from 'react';
-import {
-  MDBBtn,
-  MDBContainer,
-  MDBRow,
-  MDBCol,
-  MDBCard,
-  MDBCardBody,
-  MDBInput,
-  MDBIcon
-}
-  from 'mdb-react-ui-kit';
-import { auth } from '../../firebaseconfig';
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  updateProfile
-} from 'firebase/auth';
-import { Link, useNavigate } from "react-router-dom";
+import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBInput } from 'mdb-react-ui-kit';
+import { auth } from '../../utils/firebaselib';
+import { createUserWithEmailAndPassword , updateProfile } from 'firebase/auth';
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../../contexts/AuthContext';
-
-
+import { Alert , Button} from 'react-bootstrap';
 
 function SignupForm({ setIsSignup }) {
-  const { currentUser , setCurrentUser } = useContext(AuthContext);
-
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
   const initialState = { displayName: '', email: '', password: '' };
   const [userInput, setUserInput] = useState(initialState);
+  const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
 
   function handleOnChange(e, key) {
@@ -35,7 +20,7 @@ function SignupForm({ setIsSignup }) {
         [key]: e.target.value
       }
     })
-  }
+  };
 
   function handleSignup() {
     createUserWithEmailAndPassword(auth, userInput.email, userInput.password)
@@ -44,14 +29,17 @@ function SignupForm({ setIsSignup }) {
         const userObj = {
           ...currentUser,
           displayName: userInput.displayName,
-        }
+          photoURL: ''
+        };
         setCurrentUser(userObj);
+        if (cred) navigate("/home");
         console.log('user created:', cred.user)
       })
       .catch(err => {
         console.log(err.message)
+        setErrorMessage(err.message);
       })
-  }
+  };
 
   return (
     <MDBContainer fluid>
@@ -68,9 +56,9 @@ function SignupForm({ setIsSignup }) {
 
               <MDBInput wrapperClass='mb-4 mx-5 w-100' labelClass='text-white' label='Password' type='password' size="lg" value={userInput.password} onChange={(e) => handleOnChange(e, "password")} />
 
-              <MDBBtn outline className='mx-2 px-5' color='white' size='lg' onClick={handleSignup}>
-                Sign Up
-              </MDBBtn>
+              <Button className='login-btn mx-2 px-5' variant="outline-light" size="lg" onClick={handleSignup}>Sign Up</Button>
+
+              {errorMessage ? <Alert variant='danger'>{errorMessage}</Alert> : ''}
 
               <div>
                 <p className="mb-0">Already have an account? <a className="text-white-50 fw-bold" onClick={() => setIsSignup(false)}>Login</a></p>

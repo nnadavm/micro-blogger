@@ -1,11 +1,10 @@
-import React, { useContext } from 'react';
-import "./SinglePost.css"
+import React from 'react';
+import "./SinglePost.css";
 import moment from 'moment';
 import { Avatar } from '@mui/material';
 
-
 function SinglePost({ post }) {
-    const { content, userName, date , photoURL } = post;
+    const { content, userName, date, photoURL } = post;
 
     return (
         <div className='single-post-container'>
@@ -19,6 +18,6 @@ function SinglePost({ post }) {
             <p>{content}</p>
         </div>
     )
-}
+};
 
-export default SinglePost
+export default SinglePost;

@@ -6,3 +6,7 @@
     background-color: #15202B !important;
     color: white !important;
 }
+
+.form-container {
+    max-width: 333px;
+}

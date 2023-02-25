@@ -1,20 +1,18 @@
-import React, { useContext, useState, useEffect } from 'react'
-import "./ProfilePage.css"
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Button from 'react-bootstrap/Button';
-import UsernameContext from '../../contexts/UserCredContext';
-import { firebaseStorage, auth } from '../../firebaseconfig';
+import React, { useContext, useState, useRef } from 'react';
+import "./ProfilePage.css";
+import { Button, InputGroup, Form, Alert } from 'react-bootstrap';
+import { firebaseStorage, updateDocuments, updateFirebaseUser } from '../../utils/firebaselib';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import UserCredContext from '../../contexts/UserCredContext';
-import { getAuth, updateProfile } from 'firebase/auth';
 import { AuthContext } from '../../contexts/AuthContext';
-
+import NavBar from '../Navbar/Navbar';
+import { Avatar } from '@mui/material';
 
 function ProfilePage() {
-    const { currentUser , setCurrentUser } = useContext(AuthContext);
+    const { currentUser, setCurrentUser } = useContext(AuthContext);
     const [inputValue, setInputValue] = useState('');
     const [image, setImage] = useState(null);
+    const [errorMessage, setErrorMessage] = useState(null);
+    const fileInputRef = useRef(null);
 
     function handleImageChange(e) {
         if (e.target.files[0]) {
@@ -22,65 +20,79 @@ function ProfilePage() {
         }
     };
 
-    function updateFirebaseUser(newDisplayName, newURL) {
-        updateProfile(auth.currentUser, {
-            displayName: newDisplayName, photoURL: newURL
-        }).then(() => {
-            const { displayName, photoURL } = auth.currentUser
-            setCurrentUser({
-                ...currentUser,
-                displayName: displayName,
-                photoURL: photoURL
-            });
+    function handleSubmitDisplayName() {
+        setErrorMessage(null);
+        if (inputValue.length === 0) {
+            setErrorMessage('Display name cannot be empty!');
+            return;
+        }
+        updateFirebaseUser('displayName', inputValue, currentUser, setCurrentUser);
+        updateDocuments(currentUser.uid, { userName: inputValue });
+        setInputValue('');
+    };
 
-        }).catch((error) => {
-            console.log(error);
-        });
-    }
-
-    function handleSubmit() {
+    function handleSubmitFile(e) {
+        fileInputRef.current.value = null;
+        setErrorMessage(null);
         const imageRef = ref(firebaseStorage, "UploadedProfileImage");
         uploadBytes(imageRef, image)
             .then(() => {
                 getDownloadURL(imageRef)
                     .then((url) => {
-                        updateFirebaseUser(inputValue, url);
+                        updateFirebaseUser('photoURL', url, currentUser, setCurrentUser);
                         console.log('user updated');
+                        updateDocuments(currentUser.uid, { photoURL: url });
                     })
-                    .catch((error) => {
-                        console.log(error.message, "error getting the image url");
-                    });
-                setImage(null);
             })
             .catch((error) => {
                 console.log(error.message);
+                setErrorMessage(error.message);
             });
+        setImage(null);
     };
 
-
     return (
-        <div className='wrapper'>
-            <h1>Profile Settings</h1>
-            <Form.Label htmlFor="userNameInput">User Display Name</Form.Label>
-            <InputGroup className="mb-3">
-                <Form.Control
-                    value={inputValue}
-                    onChange={(e) => {
-                        setInputValue(e.target.value);
-                    }}
-                    className='input'
-                    id="userNameInput" />
-            </InputGroup>
-            <Form.Group controlId="formFile" className="mb-3">
-                <Form.Label>Set Profile Avatar</Form.Label>
-                <Form.Control type="file" onChange={handleImageChange} />
-            </Form.Group>
-            <Button
-                variant="outline-primary"
-                onClick={handleSubmit}
-            >Save</Button>
-        </div>
+        <>
+            <NavBar />
+            <div className='wrapper page-wrapper d-flex flex-column align-items-center'>
+                <h1>{currentUser ? currentUser.displayName : ""}</h1>
+                <div className='p-3'>
+                    <Avatar src={currentUser ? currentUser.photoURL : './emptyAvatar.jpeg'} sx={{ width: 200, height: 200 }} />
+                </div>
+                <div className='form-container'>
+                    <Form.Label htmlFor="userNameInput">User Display Name</Form.Label>
+                    <InputGroup className="mb-3">
+                        <Form.Control
+                            value={inputValue}
+                            onChange={(e) => {
+                                setInputValue(e.target.value);
+                            }}
+                            className='input'
+                            id="userNameInput" />
+                    </InputGroup>
+                    <div className='d-flex justify-content-center'>
+                        <Button
+                            className='mb-3'
+                            variant="outline-light"
+                            onClick={handleSubmitDisplayName}
+                        >Save</Button>
+                    </div>
+                    <Form.Group controlId="formFile" className="mb-3">
+                        <Form.Label>Set Profile Avatar</Form.Label>
+                        <Form.Control ref={fileInputRef} type="file" accept=".jpg,.jpeg,.png,.webp,.avif" onChange={handleImageChange}/>
+                    </Form.Group>
+
+                </div>
+                <div>
+                    <Button
+                        variant="outline-light"
+                        onClick={handleSubmitFile}
+                    >Save</Button>
+                </div>
+                {errorMessage ? <Alert variant='danger'>{errorMessage}</Alert> : ''}
+            </div>
+        </>
     )
 }
 
-export default ProfilePage
+export default ProfilePage;

@@ -2,56 +2,40 @@ import './App.css'
 import React, { useState, useEffect } from 'react';
 import HomePage from './components/HomePage/HomePage';
 import ProfilePage from './components/ProfilePage/ProfilePage';
-import NavBar from './components/Navbar/Navbar';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import UserCredContext from './contexts/UserCredContext';
+import { Routes, Route } from "react-router-dom";
 import LoginPage from './components/LoginPage/LoginPage';
-import { auth } from './firebaseconfig';
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword, signOut,
-  onAuthStateChanged
-} from 'firebase/auth'
+import { auth , suscribeToAuthChange } from './utils/firebaselib';
 import { AuthProvider } from './contexts/AuthContext';
+import LoaderComponent from './components/LoaderComponent/LoaderComponent';
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const userObj = {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL
+    suscribeToAuthChange(setCurrentUser);
+
+      setTimeout(() => {
+        setIsLoading(false);
+        if (auth.currentUser) {
+          navigate('/home');
+        } else {
+          navigate('/login')
         }
-        setCurrentUser(userObj);
-      } else {
-        setCurrentUser(null);
-      }
-    });
-    console.log('useEffect context', currentUser)
+      }, 1000);
   }, []);
 
   return (
     <AuthProvider value={{ currentUser, setCurrentUser }}>
       <div className='app-wrapper'>
-        <div className='page-wrapper'>
-          <BrowserRouter>
-            <Routes>
-              {!currentUser ?
-                <Route path="/" element={<LoginPage />} />
-                :
-                <Route path="/" element={<HomePage />} />
-              }
-              <Route path="/home" element={<HomePage />} />
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="login" element={<LoginPage />} />
-            </Routes>
-          </BrowserRouter>
-        </div>
+          <Routes>
+            <Route path="/" element={<LoaderComponent />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/login" element={<LoginPage />} />
+          </Routes>
       </div>
     </AuthProvider>
   );

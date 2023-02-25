@@ -1,28 +1,26 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import PostForm from '../PostForm/PostForm';
 import PostList from '../PostList/PostList';
-import PostsContext from '../../contexts/PostsContext';
 import NavBar from '../Navbar/Navbar';
-import { AuthContext } from '../../contexts/AuthContext';
+import { suscribeToFirebase } from '../../utils/firebaselib';
 
 function HomePage() {
     const [postsList, setPostsList] = useState([]);
-    const { currentUser } = useContext(AuthContext)
+    const [lastDocument, setLastDocument] = useState(null);
+
+    useEffect(() => {
+        suscribeToFirebase(setPostsList, setLastDocument);
+    }, [])
 
     return (
         <>
-        
             <NavBar />
-            <div className='wrapper'>
-           
-                <div className="App">
+                <div className='page-wrapper'>
                     <PostForm className='p-2' />
-                    <PostList postsList={postsList} setPostsList={setPostsList} />
-                </div>
-                
-            </div>
-        </>
+                    <PostList postsList={postsList} setPostsList={setPostsList} lastDocument={lastDocument} setLastDocument={setLastDocument} />
 
+                </div>
+        </>
     )
 }
 
